@@ -1,24 +1,67 @@
-import React from 'react'
+import React, { useReducer } from 'react'
 import Todos from './Todos'
 import TodoForm from './TodoForm'
 
 let id = 1
 const getNextId = () => id++
-const todos = [
-  { id: getNextId(), label: 'Laundry', complete: true },
-  { id: getNextId(), label: 'Groceries', complete: false },
-  { id: getNextId(), label: 'Dishes', complete: false },
-]
 
+const ADD_NEW_TOD = "ADD_NEW_TODO"
+const TOGGLE_TODO = "TOGGLE_TODO"
+const TOGGLE_SHOW_COMPLETED_TODOS = "TOGGLE_SHOW_COMPLETED_TODOS"
+
+const initialState = {
+  showComletedTodos: true,
+  todos: [
+    { id: getNextId(), label: 'Laundry', complete: true },
+    { id: getNextId(), label: 'Groceries', complete: false },
+    { id: getNextId(), label: 'Dishes', complete: false },
+  ]
+}
+const reducer = (state, action) => {
+  switch (action.type) {
+    case ADD_NEW_TOD:
+      return { ...state, todos: [...state.todos, action.payload] }
+    case TOGGLE_TODO:
+      return { ...state ,
+        todos:state.todos.map(td=>{
+          if(td.id!=action.payload) return td
+          return ({...td,complete:!td.complete})
+        })
+      }
+    case TOGGLE_SHOW_COMPLETED_TODOS:
+      return { ...state,
+        showComletedTodos:!state.showComletedTodos
+      }
+    default:
+      return state
+  }
+}
 export default function App() {
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const createNewTodo = (label, complete) => {
+    const newTodo = { id: getNextId(), label, complete }
+    dispatch({ type: ADD_NEW_TOD, payload: newTodo })
+  }
+
+  const toggleTodo = id => {
+    dispatch({type:TOGGLE_TODO,payload:id})
+  }
+
+  const toggleIsCompleted = () => {
+    dispatch({type:TOGGLE_SHOW_COMPLETED_TODOS})
+  }
   return (
     <div id="mp">
       <h2>Guided Project</h2>
       <Todos
-        todos={todos}
+        todos={state.todos}
+        toggleTodo={toggleTodo}
+        showComletedTodos={state.showComletedTodos}
+        toggleIsCompleted = {toggleIsCompleted}
       />
       <TodoForm
-
+        createNewTodo={createNewTodo}
       />
     </div>
   )

@@ -8,6 +8,9 @@ const StyledTodo = styled.li`
 
 export default function Todo({
   todos,
+  toggleTodo,
+  showComletedTodos,
+  toggleIsCompleted
 }) {
   return (
     <div id="todos">
@@ -15,15 +18,20 @@ export default function Todo({
       <ul>
         {
           todos
+          ?.filter(todo=>{
+            return showComletedTodos||!todo.complete
+          })
             .map(todo => (
-              <StyledTodo $complete={todo.complete} key={todo.id}>
+              <StyledTodo
+                onClick={()=>toggleTodo(todo.id)}
+                $complete={todo.complete} key={todo.id}>
                 <span>{todo.label}{todo.complete && ' ✔️'}</span>
               </StyledTodo>
             ))
         }
       </ul>
-      <button>
-        Hide completed todos
+      <button onClick={toggleIsCompleted}>
+        {showComletedTodos?"Hide":"Show"} Completed Todos
       </button>
     </div>
   )
